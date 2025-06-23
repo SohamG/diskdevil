@@ -151,3 +151,6 @@ rust-project.json
 .lineno
 rust-project.json
 src/numbers.rs
+src/diskdevil
+build-aux
+pfx

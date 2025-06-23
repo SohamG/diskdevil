@@ -6,6 +6,8 @@ AC_INIT([dangerdump], [0.1], [dd@sohamg.xyz])
 
 AC_CONFIG_SRCDIR([src/main.rs])
 AC_CONFIG_AUX_DIR([build-aux])
+
+AM_INIT_AUTOMAKE([foreign])
 # Checks for programs.
 
 AC_PROG_GREP
@@ -29,11 +31,20 @@ AC_SUBST([rustc_sysroot], [$($RUSTC --print sysroot)])
 
 AC_MSG_NOTICE([Setting sysroot to $rustc_sysroot])
 
+AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
+AC_ARG_VAR([RUSTCFLAGS], [Additional rustc flags flags])
 
-AC_CHECK_HEADERS([asm/unistd.h], [], [AC_MSG_ERROR([Need linux headers])])
+AC_MSG_CHECKING([for presence of asm/unistd.h])
 
-AC_CONFIG_COMMANDS([runcpp], [$CPP -P -imacros "asm/unistd.h" -o src/numbers.rs numbers.cpp.rs], [CPP=$CPP])
 
-AC_CONFIG_FILES([rust-project.json])
+AS_IF([$CPP $CPPFLAGS -imacros "asm/unistd.h" /dev/null 2>&1 > /dev/null],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_ERROR([header asm/unistd.h not found!])])
+
+dnl AC_CHECK_HEADERS([asm/unistd.h], [], [AC_MSG_ERROR([Need linux headers])])
+
+AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS -P -imacros "asm/unistd.h" -o src/numbers.rs numbers.cpp.rs], [CPP=$CPP])
+
+AC_CONFIG_FILES([rust-project.json Makefile src/Makefile])
 
 AC_OUTPUT
