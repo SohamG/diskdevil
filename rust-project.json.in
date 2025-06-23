@@ -1,0 +1,21 @@
+{
+  "crates": [
+    {
+      "root_module": "@abs_builddir@/src/main.rs",
+      "edition": "2024",
+      "crate_type": ["bin"],
+      "deps": [],
+      "cfg": [
+          "no_std",
+	  "panic=abort"
+      ],
+      "env": {},
+      "target": "x86_64-unknown-none",
+      "source": {
+          "include_dirs": ["@abs_builddir@/src"],
+	  "exclude_dirs": []
+      }
+    }
+  ],
+    "sysroot": "@rustc_sysroot@"
+}
