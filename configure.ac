@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.72])
-AC_INIT([dangerdump], [0.1], [dd@sohamg.xyz])
+AC_INIT([diskdevil], [0.1], [dd@sohamg.xyz])
 
 AC_CONFIG_SRCDIR([src/main.rs])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -31,7 +31,6 @@ AC_SUBST([rustc_sysroot], [$($RUSTC --print sysroot)])
 
 AC_MSG_NOTICE([Setting sysroot to $rustc_sysroot])
 
-AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 AC_ARG_VAR([RUSTCFLAGS], [Additional rustc flags flags])
 
 AC_MSG_CHECKING([for presence of asm/unistd.h])
@@ -41,9 +40,18 @@ AS_IF([$CPP $CPPFLAGS -imacros "asm/unistd.h" /dev/null 2>&1 > /dev/null],
       [AC_MSG_RESULT([yes])],
       [AC_MSG_ERROR([header asm/unistd.h not found!])])
 
-dnl AC_CHECK_HEADERS([asm/unistd.h], [], [AC_MSG_ERROR([Need linux headers])])
+AC_MSG_CHECKING([for presence of limits.h])
 
-AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS -P -imacros "asm/unistd.h" -o src/numbers.rs numbers.cpp.rs], [CPP=$CPP])
+
+AS_IF([$CPP $CPPFLAGS -imacros "limits.h" /dev/null 2>&1 > /dev/null],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_ERROR([header limits.h not found!])])
+
+CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -P"
+
+AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
+
+AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS numbers.cpp.rs -o src/numbers.rs], [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
 AC_CONFIG_FILES([rust-project.json Makefile src/Makefile])
 

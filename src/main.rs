@@ -1,17 +1,23 @@
 #![no_std]
 #![no_main]
+#![allow(unreachable_code)]
 
-use core::ffi::CStr;
 // use core::panic::PanicInfo;
-use core::ptr;
 use core::arch::global_asm;
+use core::fmt::Write;
 use core::slice::from_raw_parts;
-use core::str::from_utf8;
 
+pub mod asm;
 pub mod numbers;
-mod syscalls;
+pub use numbers::*;
 
-global_asm!{
+pub mod syscalls;
+pub mod writer;
+
+pub const MAX_ARG: usize = 10;
+
+global_asm! {
+    ".section .text",
     ".global _start",
     "_start:",
     "pop rdi",
@@ -19,49 +25,48 @@ global_asm!{
     "call main"
 }
 
-unsafe fn bytes_null<'a>(bytes: *const u8) -> &'a [u8] {
-    const MAX_LEN: usize = 1024;
-    for i in 0..MAX_LEN {
-	if *bytes.offset(i as isize) == 0 {
-	    return from_raw_parts(bytes, i);
-	}
+unsafe fn str_null<'a>(bytes: *const u8) -> &'a str {
+    unsafe {
+        for i in 0..numbers::MAX_PATH {
+            if *bytes.offset(i as isize) == 0 {
+                return core::str::from_utf8(from_raw_parts(bytes, i)).expect("");
+            }
+        }
+        syscalls::write(2, "Argument longer than 1024".as_bytes());
+        syscalls::exit(-1);
+        unreachable!();
     }
-    return from_raw_parts(bytes, MAX_LEN);
 }
 
 #[no_mangle]
-pub unsafe fn main(argc: i32, argv: *const *const u8) -> i32 {
-    unsafe{
-	let argv_slice = from_raw_parts(argv, argc as usize);
-	// let offset = *argv as *const i8;
-	syscalls::write(1, bytes_null(argv_slice[1]));
-	syscalls::exit(0);
-    }
-    // for i in 0..argc {
-    //     unsafe {
-    //         let arg_ptr = *argv.offset(i as isize);
-    //         if !arg_ptr.is_null() {
-    //             let c_str = CStr::from_ptr(arg_ptr as *const i8);
-    //             // SAFETY: assume all args are valid UTF-8 for this example
-    //             if let Ok(s) = c_str.to_str() {
-    //                 my_print(s);
-    //                 my_print("\n");
-    //             }
-    //         }
-    //     }
-    // }
+pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
+    let final_args = &unsafe {
+        let argv_slice = from_raw_parts(argv, argc as usize);
+        let mut ans: [&str; MAX_ARG] = [&""; MAX_ARG];
+        for i in 0..argc {
+            ans[i as usize] = str_null(argv_slice[i as usize]);
+        }
+	ans
+    }[..argc];
 
-    0
+    
+    writer::debug("🦀Args:");
+    writer::debug(final_args[0]);
+    writer::debug(final_args[1]);
+
+    print!("This is a print!\n");
+    print!("This is a {} print with args!!\n", final_args[1]);
+    dbg!("This is debug lol {} {}", 6, 9);
+
+    bail!(-1, "Testing bailing out! {} ", final_args[0]);
+
+    syscalls::exit(0)
 }
 
-// fn my_print(s: &str) {
-//     unsafe {
-//         libc::write(1, s.as_ptr() as *const _, s.len());
-//     }
-// }
 
 //Required for `#![no_std]`
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    loop{}
+fn mypanic(info: &core::panic::PanicInfo) -> ! {
+    writer::debug(info.message());
+    loop {}
 }

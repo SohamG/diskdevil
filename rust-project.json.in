@@ -7,7 +7,7 @@
       "deps": [],
       "cfg": [
           "no_std",
-	  "panic=abort"
+	  "panic=\"abort\""
       ],
       "env": {},
       "target": "x86_64-unknown-none",

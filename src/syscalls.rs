@@ -1,28 +1,31 @@
-#![no_std]
-
 use core::arch::asm;
-use core::ffi::CStr;
+use core::convert::AsRef;
 
-use numbers::WRITE;
+use numbers::*;
 
-pub unsafe fn write(fd: i32, data: &[u8]) -> i32 {
-
-    let ptr = data.as_ptr();
+pub fn write(fd: i32, data: impl AsRef<[u8]>) -> i32 {
+    let ptr = data.as_ref();
 
     let result;
-    asm!("syscall",
+    unsafe {
+        asm!("syscall",
 	 inlateout("rax") WRITE => result,
 	 in("rdi") fd,
-	 in("rsi") ptr,
-	 in("rdx") data.len(),
+	 in("rsi") ptr.as_ptr(),
+	 in("rdx") ptr.len(),
 	 lateout("rcx") _,
 	 lateout("r11") _);
-    // asm!("mov rax, ${num}", "mov rdi, $1", "mov rsi, ${x}", "syscall",
-    // 	 x = in(reg) ptr, out("rax") result, num = const WRITE);
+    }
     return result;
-
 }
 
-pub unsafe fn exit(code: i32) {
-    asm!("mov rax, $60", "mov rdi, ${c:r}", "syscall", c = in(reg) code);
+pub fn exit(code: i32) -> ! {
+    // asm!("mov rax, $60", "mov rdi, ${c:r}", "syscall", c = in(reg) code, options(noreturn));
+    unsafe {
+        asm!("syscall",
+	 in("rax") 60,
+	 in("rdi") code,
+	 options(noreturn));
+    }
+    unreachable!()
 }
