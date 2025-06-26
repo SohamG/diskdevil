@@ -3894,7 +3894,7 @@ printf "%s\n" "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "cpp":C) $CPP $CPPFLAGS numbers.cpp.rs -o src/numbers.rs ;;
+    "cpp":C) $CPP $CPPFLAGS src/numbers.cpp.rs -o src/numbers.rs ;;
 
   esac
 done # for ac_tag
