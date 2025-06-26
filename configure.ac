@@ -86,7 +86,7 @@ CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -imacros fcntl.h -P"
 AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 
 ### Finish up
-AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS src/numbers.cpp.rs -o src/numbers.rs],
+AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS $ac_abs_srcdir/src/numbers.cpp.rs -o src/numbers.rs],
 			  [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
 AC_CONFIG_FILES([rust-project.json

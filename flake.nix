@@ -47,6 +47,7 @@
               gdb
               rust-analyzer
               linuxHeaders
+              act
               moreutils
             ];
             shellHook = ''

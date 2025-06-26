@@ -1,0 +1,40 @@
+#+TITLE: diskdevil - Devilishly fast ISO to USB
+
+* Introduction
+Diskdevil is a fancy wrapper for the =sendfile64= system call on linux,
+enabling super fast zero-copy file transfers. Learn more about sendfile
+by consulting your local `man` command.
+
+** Installing
+Grab a release tarball, and
+#+BEGIN_SRC sh
+  ./configure && make && make install
+#+END_SRC
+
+* Doesn't DD already do this?
+Well yes, and that is the inspiration for the name __d__isk__devil__. However,
+=dd= is approximately 25 centuries old and only uses read/write system calls [1].
+Diskdevil does not (and probably will not) support all of the disk-destroying
+capabilities of =dd=, but *should* be faster at what basically everyone uses
+=dd= for, to dump Linux ISOs to USBs.
+
+* Can't you write a syscall wrapper in like 5 lines?
+Also yes, but I wanted a challege (read: procrastinate) so I decided to make it
+=no_std= ie no rust standard lib apart from =core=, no =libc=, no nothing. Just
+me and some inline assembly.
+
+I also wrote it __WITHOUT__ cargo for......reasons.
+
+* What's all this ./configure crap?
+What's [[./Cargo.toml][Cargo]]?
+
+* Why write it in Rust?
+The white house told me to? Safety or something.
+
+* How can you get the safety of rust if theres a bunch of inline asm and everything is unsafe?
+What's with all these questions?
+
+* LICENSE
+[[./LICENSE][GPLv3]] especially the "AS-IS" and "no warranty" parts.
+
+[1]: Citation needed.

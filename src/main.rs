@@ -106,6 +106,18 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const c_char) -> ! {
 
     let from_sz = file_size(from_fd);
 
+    if from_sz == 0 {
+	bail!(-1,
+	      "{}Size of input file {}{}{}{} was zero. Perhaps it is not seekable? {}",
+	      colours::FG_BRIGHT_RED,
+	      colours::UNDERLINE,
+	      cli.from,
+	      colours::RESET,
+	      colours::FG_BRIGHT_RED,
+	      colours::RESET
+	);
+    }
+
     print!("Size of input file is {} bytes", from_sz);
 
     print!("{} {} {}", to_fd, from_fd, from_sz);
@@ -126,7 +138,7 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const c_char) -> ! {
     if res != from_sz {
         bail!(
             -1,
-            "{} Short write: wrote {} fewer bytes then desired\nWrote: {}\nDesired:{} {}",
+            "{}Short write: wrote {} fewer bytes then desired\nWrote: {}\nDesired:{} {}",
             colours::FG_BRIGHT_RED,
             from_sz - res,
             res,
@@ -136,7 +148,7 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const c_char) -> ! {
     }
 
     print!(
-        "{} Successfully wrote all {}{}{} bytes to {}{}{}! {}",
+        "{}Successfully wrote all {}{}{} bytes to {}{}{}! {}",
         colours::BOLD,
         colours::FG_BRIGHT_GREEN,
         res,

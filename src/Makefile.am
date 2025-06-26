@@ -4,8 +4,10 @@ check_PROGRAMS = testdevil.test
 diskdevil_SOURCES = main.rs
 testdevil_test_SOURCES = test_main.rs
 
-EXTRA_diskdevil_DEPENDENCIES = syscalls.rs numbers.rs writer.rs asm.rs args.rs 
+EXTRA_diskdevil_DEPENDENCIES = syscalls.rs numbers.cpp.rs writer.rs asm.rs args.rs colours.rs
 EXTRA_testdevil_test_DEPENDENCIES = $(EXTRA_diskdevil_DEPENDENCIES)
+
+EXTRA_DIST=$(EXTRA_diskdevil_DEPENDENCIES)
 
 LDADD = main.rs
 testdevil_test_LDADD = test_main.rs
