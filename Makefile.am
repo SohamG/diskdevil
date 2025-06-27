@@ -1,4 +1,4 @@
-CC=$(RUSTC)
-
+#CC=$(RUSTC)
+# @CC@
 SUBDIRS=src
 EXTRA_DIST=README.org

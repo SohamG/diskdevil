@@ -613,9 +613,11 @@ ac_unique_file="src/main.rs"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 CPPFLAGS
+CFLAGS
 RUSTCFLAGS
 rustc_sysroot
 CPP
+CC
 RUSTC
 GREP
 AM_BACKSLASH
@@ -1708,7 +1710,7 @@ fi
 
 
 # Auxiliary files required by this configure script.
-ac_aux_files="missing install-sh"
+ac_aux_files="tap-driver.pl missing install-sh"
 
 # Locations in which to look for auxiliary files.
 ac_aux_dir_candidates="${srcdir}/build-aux"
@@ -2500,6 +2502,8 @@ END
   fi
 fi
 
+
+
 # Checks for programs.
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
@@ -2628,6 +2632,9 @@ then :
   as_fn_error $? "No rustc in PATH!" "$LINENO" 5
 fi
 
+CC="$RUSTC"
+
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if sendfile system call is supported" >&5
 printf %s "checking if sendfile system call is supported... " >&6; }
 
@@ -2702,12 +2709,15 @@ rustc_sysroot=$($RUSTC --print sysroot)
 printf "%s\n" "$as_me: Setting sysroot to $rustc_sysroot" >&6;}
 
 
+CFLAGS="$RUSTCFLAGS"
+
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for presence of asm/unistd.h" >&5
 printf %s "checking for presence of asm/unistd.h... " >&6; }
 
 
-if $CPP $CPPFLAGS -imacros "asm/unistd.h" /dev/null 2>&1 > /dev/null
+if $CPP $CPPFLAGS -imacros "asm/unistd.h" -imacros "fcntl.h" /dev/null 2>&1 > /dev/null
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
@@ -2736,7 +2746,7 @@ CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -P"
 ac_config_commands="$ac_config_commands cpp"
 
 
-ac_config_files="$ac_config_files rust-project.json Makefile src/Makefile"
+ac_config_files="$ac_config_files rust-project.json Makefile src/Makefile tests/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -3465,6 +3475,7 @@ do
     "rust-project.json") CONFIG_FILES="$CONFIG_FILES rust-project.json" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: '$ac_config_target'" "$LINENO" 5;;
   esac

@@ -1,8 +1,10 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(not(mytest), no_std)]
+#![cfg_attr(not(mytest), no_main)]
 #![allow(unreachable_code)]
 
 // use core::panic::PanicInfo;
+#[cfg(mytest)]
+extern crate core;
 use core::arch::global_asm;
 use core::fmt::Write;
 use core::slice::from_raw_parts;
@@ -16,6 +18,7 @@ pub mod writer;
 
 pub const MAX_ARG: usize = 10;
 
+#[cfg(not(mytest))]
 global_asm! {
     ".section .text",
     ".global _start",
@@ -38,7 +41,8 @@ unsafe fn str_null<'a>(bytes: *const u8) -> &'a str {
     }
 }
 
-#[no_mangle]
+#[cfg_attr(not(no_mangle), no_mangle)]
+#[cfg(not(mytest))]
 pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
     let final_args = &unsafe {
         let argv_slice = from_raw_parts(argv, argc as usize);
@@ -65,8 +69,14 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
 
 
 //Required for `#![no_std]`
+#[cfg(not(mytest))]
 #[panic_handler]
 fn mypanic(info: &core::panic::PanicInfo) -> ! {
     writer::debug(info.message());
     loop {}
+}
+
+#[cfg(mytest)]
+pub fn main() {
+    std::println!("Test!");
 }
