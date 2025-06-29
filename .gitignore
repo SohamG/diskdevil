@@ -154,3 +154,7 @@ src/numbers.rs
 src/diskdevil
 build-aux
 pfx
+*.tar.gz
+*.log
+*.trs
+*.test

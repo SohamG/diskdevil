@@ -1,7 +1,7 @@
-use asm;
+extern crate core;
 use core::fmt::{Display, Write};
-use numbers::*;
-use syscalls;
+use crate::numbers::*;
+use crate::syscalls;
 
 pub struct WriteBuf {
     pub data: [u8; MAX_PATH],
@@ -16,6 +16,12 @@ pub fn new() -> WriteBuf {
     let offset = 0;
 
     WriteBuf { data, offset }
+}
+
+pub fn new_str(s: impl Display) -> WriteBuf {
+    let mut ans = new();
+    write!(ans, "{}", s).unwrap();
+    return ans;
 }
 
 impl core::fmt::Write for WriteBuf {
@@ -41,13 +47,21 @@ impl core::fmt::Write for WriteBuf {
     }
 }
 
+impl Display for WriteBuf {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+	write!(f, "{}", core::str::from_utf8(&self.data[..self.offset]).unwrap())
+    }
+}
+
+
 #[macro_export]
 macro_rules! print {
     ($f:literal $(,)? $($a:expr),*) => {
         let mut buf = crate::writer::new();
+
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
-	let result = syscalls::write(1, buf.data);
+	let result = crate::syscalls::write(1, buf.data);
 	assert!(result == buf.data.len() as i32);
     };
 }
@@ -56,11 +70,12 @@ macro_rules! print {
 macro_rules! dbg {
     ($f:literal $(,)? $($a:expr),*) => {
         let mut buf = crate::writer::new();
+
 	write!(buf, "Debug:{}:{}:{}: ", file!(), line!(), column!())
 	    .expect("debug");
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
-	let result = syscalls::write(2, buf.data);
+	let result = crate::syscalls::write(2, buf.data);
 	assert!(result == buf.data.len() as i32);
     };
 }
@@ -69,12 +84,11 @@ macro_rules! dbg {
 macro_rules! bail {
     ($code:expr $(,$f:literal $(,)? $($a:expr),*)?) => {
 	let exit_code: i32 = $code;
-	$(dbg!($f, $($a),*);)?
-	syscalls::exit(exit_code);
+	$(crate::dbg!($f, $($a),*);)?
+	crate::syscalls::exit(exit_code);
     };
 }
 
 pub fn debug(s: impl Display) {
     dbg!("{}", s);
 }
-

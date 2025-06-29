@@ -2,21 +2,30 @@
 #![cfg_attr(not(mytest), no_main)]
 #![allow(unreachable_code)]
 
-// use core::panic::PanicInfo;
 #[cfg(mytest)]
-extern crate core;
+pub extern crate core;
+
+#[macro_use]
+pub mod writer;
+
 use core::arch::global_asm;
-use core::fmt::Write;
 use core::slice::from_raw_parts;
+use core::ffi::*;
+use core::fmt::*;
 
 pub mod asm;
 pub mod numbers;
-pub use numbers::*;
+pub mod args;
 
 pub mod syscalls;
-pub mod writer;
+
+
+pub use crate::numbers::*;
 
 pub const MAX_ARG: usize = 10;
+pub type MyStr = &'static CStr;
+
+
 
 #[cfg(not(mytest))]
 global_asm! {
@@ -28,25 +37,18 @@ global_asm! {
     "call main"
 }
 
-unsafe fn str_null<'a>(bytes: *const u8) -> &'a str {
-    unsafe {
-        for i in 0..numbers::MAX_PATH {
-            if *bytes.offset(i as isize) == 0 {
-                return core::str::from_utf8(from_raw_parts(bytes, i)).expect("");
-            }
-        }
-        syscalls::write(2, "Argument longer than 1024".as_bytes());
-        syscalls::exit(-1);
-        unreachable!();
+unsafe fn str_null(bytes: *const c_char) -> MyStr {
+    unsafe{
+	return CStr::from_ptr(bytes);
     }
 }
 
-#[cfg_attr(not(no_mangle), no_mangle)]
+#[cfg_attr(not(no_mangle), unsafe(no_mangle))]
 #[cfg(not(mytest))]
-pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
+pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
     let final_args = &unsafe {
         let argv_slice = from_raw_parts(argv, argc as usize);
-        let mut ans: [&str; MAX_ARG] = [&""; MAX_ARG];
+        let mut ans: [MyStr; MAX_ARG] = [&(c""); MAX_ARG];
         for i in 0..argc {
             ans[i as usize] = str_null(argv_slice[i as usize]);
         }
@@ -55,14 +57,14 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
 
     
     writer::debug("🦀Args:");
-    writer::debug(final_args[0]);
-    writer::debug(final_args[1]);
+    writer::debug(final_args[0].to_str().unwrap());
+    writer::debug(final_args[1].to_str().unwrap());
 
     print!("This is a print!\n");
-    print!("This is a {} print with args!!\n", final_args[1]);
+    print!("This is a {} print with args!!\n", final_args[1].to_str().unwrap());
     dbg!("This is debug lol {} {}", 6, 9);
 
-    bail!(-1, "Testing bailing out! {} ", final_args[0]);
+    bail!(-1, "Testing bailing out! {} ", final_args[0].to_str().unwrap());
 
     syscalls::exit(0)
 }
@@ -73,10 +75,60 @@ pub unsafe extern "C" fn main(argc: usize, argv: *const *const u8) -> ! {
 #[panic_handler]
 fn mypanic(info: &core::panic::PanicInfo) -> ! {
     writer::debug(info.message());
-    loop {}
+    bail!(-100);
 }
 
 #[cfg(mytest)]
 pub fn main() {
-    std::println!("Test!");
+    use std::*;
+    use crate::args;
+    println!("1..{}", 3);
+    let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
+
+    if res > 0 {
+	println!("ok 1 - Syscall write worked");
+    } else {
+	println!("not ok 1 - Syscall write returned {}", res);
+    }
+
+    let res = syscalls::write(-1, "test: testing write syscall!".as_bytes());
+
+    if res > 0 {
+	println!("not ok 2 - Syscall should have failed!");
+    } else {
+	println!("ok 2 - Syscall write returned expected negative value {}", res);
+    }
+
+    let myargs = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-"] as &[MyStr]);
+
+    match myargs {
+	Ok(a) => {
+	    println!("ok 3 - try into for cliargs works {}", a);
+	},
+	Err(e) => {
+	    println!("not ok 3 - try into produced {}", e);
+	}
+    }
+
+    let myargs2 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-h"] as &[MyStr]);
+
+    match myargs2 {
+	Ok(a) => {
+	    println!("not ok 4 - cli with -h");
+	},
+	Err(e) => {
+	    println!("ok 4 - cli with -h");
+	}
+    };
+
+    
+
+}
+
+#[cfg(mytests)]
+pub fn test_result<T: Debug, U: Debug>(r: Result<T, U>, num: i32, desc: String) {
+    match r {
+	Ok(t) => println!("ok {num} - {desc} {t}"),
+	Err(u) => println!("not ok {num} - {desc} {u}"),
+    }
 }

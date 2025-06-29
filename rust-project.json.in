@@ -1,21 +1,24 @@
 {
   "crates": [
     {
+	"display_name": "diskdevil",
       "root_module": "@abs_builddir@/src/main.rs",
       "edition": "2024",
       "crate_type": ["bin"],
-      "deps": [],
+	"deps": [],
       "cfg": [
-          "no_std",
+	  "no_std",
 	  "panic=\"abort\""
+	  
       ],
       "env": {},
       "target": "x86_64-unknown-none",
       "source": {
-          "include_dirs": ["@abs_builddir@/src"],
+          "include_dirs": ["@abs_builddir@/src/"],
 	  "exclude_dirs": []
       }
     }
   ],
-    "sysroot": "@rustc_sysroot@"
+    "sysroot": "@rustc_sysroot@",
+    "sysroot_src": "@rustc_sysroot@/lib/rustlib/src/rust/library"
 }

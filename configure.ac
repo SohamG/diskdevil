@@ -7,8 +7,9 @@ AC_INIT([diskdevil], [0.1], [dd@sohamg.xyz])
 AC_CONFIG_SRCDIR([src/main.rs])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([foreign no-dependencies nostdinc -Wall])
-AC_REQUIRE_AUX_FILE([tap-driver.pl])
+####HERE
+AM_INIT_AUTOMAKE([foreign nostdinc])
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
 # Checks for programs.
 
 AC_PROG_GREP
@@ -60,6 +61,6 @@ AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 
 AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS src/numbers.cpp.rs -o src/numbers.rs], [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
-AC_CONFIG_FILES([rust-project.json Makefile src/Makefile tests/Makefile])
+AC_CONFIG_FILES([rust-project.json Makefile src/Makefile ])
 
 AC_OUTPUT

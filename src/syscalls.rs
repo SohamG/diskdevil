@@ -1,7 +1,7 @@
 use core::arch::asm;
 use core::convert::AsRef;
 
-use numbers::*;
+use crate::numbers::*;
 
 pub fn write(fd: i32, data: impl AsRef<[u8]>) -> i32 {
     let ptr = data.as_ref();

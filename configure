@@ -1710,7 +1710,7 @@ fi
 
 
 # Auxiliary files required by this configure script.
-ac_aux_files="tap-driver.pl missing install-sh"
+ac_aux_files="tap-driver.sh missing install-sh"
 
 # Locations in which to look for auxiliary files.
 ac_aux_dir_candidates="${srcdir}/build-aux"
@@ -1880,6 +1880,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+####HERE
 am__api_version='1.16'
 
 
@@ -2746,7 +2747,7 @@ CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -P"
 ac_config_commands="$ac_config_commands cpp"
 
 
-ac_config_files="$ac_config_files rust-project.json Makefile src/Makefile tests/Makefile"
+ac_config_files="$ac_config_files rust-project.json Makefile src/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -3475,7 +3476,6 @@ do
     "rust-project.json") CONFIG_FILES="$CONFIG_FILES rust-project.json" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: '$ac_config_target'" "$LINENO" 5;;
   esac
