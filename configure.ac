@@ -9,7 +9,7 @@ AC_INIT([diskdevil], m4_defn([GIT_HASH]), [dd@sohamg.xyz])
 AC_CONFIG_SRCDIR([src/main.rs])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign nostdinc])
-AC_REQUIRE_AUX_FILE([tap-driver.sh])
+AC_REQUIRE_AUX_FILE([tap-driver.pl])
 
 ### Check Programs
 AC_PROG_GREP
@@ -31,6 +31,10 @@ AC_ARG_VAR([CPP], [Location of C Pre Processor])
 AC_PATH_PROG([CPP], [cpp], [no])
 AS_IF([test "x$CPP" = "xno"], [AC_MSG_ERROR([No C pre processor in path!])])
 
+AC_MSG_CHECKING([if laws of physics still hold])
+sleep 1s;
+AC_MSG_RESULT([no])
+
 AC_SUBST([rustc_sysroot], [$($RUSTC --print sysroot)])
 
 AC_MSG_NOTICE([Setting sysroot to $rustc_sysroot])
@@ -40,8 +44,12 @@ CFLAGS="$RUSTCFLAGS"
 
 AC_SUBST([CFLAGS])
 
-AC_MSG_CHECKING([for presence of asm/unistd.h])
 
+AC_MSG_CHECKING([if javascript still sucks])
+sleep 1s;
+AC_MSG_RESULT([yes])
+
+AC_MSG_CHECKING([for presence of asm/unistd.h])
 
 AS_IF([$CPP $CPPFLAGS -imacros "asm/unistd.h" -imacros "fcntl.h" /dev/null 2>&1 > /dev/null],
       [AC_MSG_RESULT([yes])],
@@ -54,6 +62,13 @@ AS_IF([$CPP $CPPFLAGS -imacros "limits.h" /dev/null 2>&1 > /dev/null],
       [AC_MSG_RESULT([yes])],
       [AC_MSG_ERROR([header limits.h not found!])])
 
+AC_MSG_CHECKING([for equality of P and NP])
+sleep 2s;
+AC_MSG_RESULT([yes])
+
+
+
+AC_MSG_CHECKING([for presence of fcntl.h])
 AS_IF([$CPP $CPPFLAGS -imacros "fcntl.h" /dev/null 2>&1 > /dev/null],
       [AC_MSG_RESULT([yes])],
       [AC_MSG_ERROR([header limits.h not found!])])

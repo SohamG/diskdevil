@@ -16,11 +16,11 @@ pub mod writer;
 pub const MAX_ARG: usize = 10;
 pub type MyStr = &'static core::ffi::CStr;
 
-static TEST_COUNT: i32 = 9;
 
 pub fn main() {
-    println!("1..{}", TEST_COUNT);
+    let mut count = 0;
     let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
+    count += 1;
 
     if let Ok(r) = res {
 	println!("ok 1 - Syscall write worked {r}");
@@ -30,6 +30,7 @@ pub fn main() {
 
 
     let res = syscalls::write(-1, "test: testing write syscall!".as_bytes());
+    count += 1;
 
     if let Ok(r) = res {
 	println!("not ok 2 - Syscall should have failed!");
@@ -38,6 +39,7 @@ pub fn main() {
     }
 
     let myargs = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-"] as &[MyStr]);
+    count += 1;
 
     match myargs {
 	Ok(a) => {
@@ -50,6 +52,8 @@ pub fn main() {
 
     let myargs2 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-h"] as &[MyStr]);
 
+    count += 1;
+
     match myargs2 {
 	Ok(a) => {
 	    println!("not ok 4 - cli with -h");
@@ -60,6 +64,7 @@ pub fn main() {
     };
 
     let myargs3 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"kjkjkjh", c"fooo"] as &[MyStr]);
+    count += 1;
 
     let arg3s = "cli args too many args";
     match myargs3 {
@@ -76,6 +81,7 @@ pub fn main() {
     }
 
     let myargs3 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"bar"] as &[MyStr]);
+    count += 1;
 
     let arg3s = "cli args too few args";
     match myargs3 {
@@ -92,10 +98,13 @@ pub fn main() {
     }
 
     let t = "open normal file";
+    count += 1;
     test_result(syscalls::open(c"./main.rs", numbers::open::READ_WRITE, 0), 7, "syscall open bashrc");
+    count += 1;
     test_result(syscalls::open_str(&"./main.rs", numbers::open::READ_WRITE, 0), 8, "syscall open bashrc");
 
     let t = "get from fd from cli";
+    count += 1;
 
     let cli = TryInto::<args::CliArgs>::try_into(&[c"foo", c"-", c"-"] as &[MyStr]);
 
@@ -110,6 +119,8 @@ pub fn main() {
 	    Ok(_) => println!("not ok 9 - {t} invalid Ok")
 	}
     };
+
+    println!("1..{}", count);
 }
 
 

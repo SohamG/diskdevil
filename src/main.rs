@@ -68,7 +68,7 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
     let from = 
 	
 
-    syscalls::exit(0)
+    syscalls::exit(0);
 }
 
 

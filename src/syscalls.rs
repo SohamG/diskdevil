@@ -54,24 +54,24 @@ pub fn open(path: &CStr, flags: i64, mode: i64) -> Result<u32, i32> {
     }
 }
 
-pub fn sendfile(to: u32, from: u32, u32: offset, count: usize) -> Result<u32, i32> {
-    let mut ans: i32;
-    unsafe{
-	asm!("syscall",
-	     in("rax") SENDFILE => ans,
-	     in("rdi") to,
-	     in("rsi") from,
-	     in("rdx") offset,
-	     in("r10") count
-	);
-    };
+// pub fn sendfile(to: u32, from: u32, u32: offset, count: usize) -> Result<u32, i32> {
+//     let mut ans: i32;
+//     unsafe{
+// 	asm!("syscall",
+// 	     in("rax") SENDFILE => ans,
+// 	     in("rdi") to,
+// 	     in("rsi") from,
+// 	     in("rdx") offset,
+// 	     in("r10") count
+// 	);
+//     };
 
-    if ans >= 0 {
-	Ok(ans as u32)
-    } else {
-	Err(ans as i32)
-    }
-}
+//     if ans >= 0 {
+// 	Ok(ans as u32)
+//     } else {
+// 	Err(ans as i32)
+//     }
+// }
 
 pub fn open_str(path: &str, flags: i64, mode: i64) -> Result<u32, i32> {
     let cs = unsafe{

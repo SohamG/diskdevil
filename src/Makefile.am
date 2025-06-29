@@ -20,7 +20,8 @@ diskdevil_CFLAGS=--target x86_64-unknown-none --cfg no_std \
 testdevil_test_CFLAGS=--cfg mytest --crate-type=bin --extern std --edition 2024 -g
 
 
-TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh --color-tests yes --no-merge --comments
+# TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh --color-tests yes --no-merge --comments
+TEST_LOG_DRIVER = $(top_srcdir)/build-aux/tap-driver.pl 
 TESTS = testdevil.test
 
 

@@ -8,8 +8,8 @@
 	"deps": [],
       "cfg": [
 	  "no_std",
-	  "panic=\"abort\""
-	  
+	  "panic=\"abort\"",
+	  "--edition=\"2024\""
       ],
       "env": {},
       "target": "x86_64-unknown-none",
