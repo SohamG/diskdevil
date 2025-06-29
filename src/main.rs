@@ -16,7 +16,7 @@ use core::fmt::*;
 pub mod asm;
 pub mod numbers;
 pub mod args;
-
+pub mod config;
 pub mod syscalls;
 
 
@@ -57,9 +57,14 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	ans
     }[..argc];
 
-    let cli = CliArgs::parse(final_args);
-
-    dbg!("{:?}", cli);
+    let cli = match CliArgs::parse(final_args) {
+	Ok(c) => c,
+	Err(s) => {
+	    syscalls::write(2, s.to_str()).unwrap();
+	    bail!(-1);
+	}
+    };
+	
 
     syscalls::exit(0)
 }
@@ -67,79 +72,9 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 
 //Required for `#![no_std]`
 #[cfg(not(mytest))]
+#[cfg(no_std)]
 #[panic_handler]
 fn mypanic(info: &core::panic::PanicInfo) -> ! {
-    writer::debug(info.message());
-    bail!(-100);
+    bail!(-100, "{}", info.message());
 }
 
-#[cfg(mytest)]
-pub fn main() {
-    use std::*;
-    use crate::args;
-    println!("1..{}", 5);
-    let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
-
-    if res > 0 {
-	println!("ok 1 - Syscall write worked");
-    } else {
-	println!("not ok 1 - Syscall write returned {}", res);
-    }
-
-    let res = syscalls::write(-1, "test: testing write syscall!".as_bytes());
-
-    if res > 0 {
-	println!("not ok 2 - Syscall should have failed!");
-    } else {
-	println!("ok 2 - Syscall write returned expected negative value {}", res);
-    }
-
-    let myargs = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-"] as &[MyStr]);
-
-    match myargs {
-	Ok(a) => {
-	    println!("ok 3 - try into for cliargs works {}", a);
-	},
-	Err(e) => {
-	    println!("not ok 3 - try into produced {}", e);
-	}
-    }
-
-    let myargs2 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"-h"] as &[MyStr]);
-
-    match myargs2 {
-	Ok(a) => {
-	    println!("not ok 4 - cli with -h");
-	},
-	Err(e) => {
-	    println!("ok 4 - cli with -h");
-	}
-    };
-
-    let myargs3 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"kjkjkjh", c"fooo"] as &[MyStr]);
-
-    let arg3s = "cli args too many args";
-    match myargs3 {
-	Ok(_) => {
-	    println!("not ok 5 - returned ok {arg3s}");
-	},
-	Err(e) => {
-	    if e == args::ERR_TOO_MANY {
-		println!("ok 5 - {arg3s}");
-	    } else {
-		println!("not ok 5 - error msg incorrect {arg3s} {e}");
-	    }
-	}
-    }
-
-    
-
-}
-
-#[cfg(mytests)]
-pub fn test_result<T: Debug, U: Debug>(r: Result<T, U>, num: i32, desc: String) {
-    match r {
-	Ok(t) => println!("ok {num} - {desc} {t}"),
-	Err(u) => println!("not ok {num} - {desc} {u}"),
-    }
-}

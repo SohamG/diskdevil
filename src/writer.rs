@@ -24,6 +24,12 @@ impl Debug for WriteBuf {
     }
 }
 
+impl WriteBuf {
+    pub fn to_str<'a>(&'a self) -> &'a str {
+	return core::str::from_utf8(&self.data[..self.offset]).unwrap();
+    }
+}
+
 pub fn new() -> WriteBuf {
     let data: [u8; MAX_PATH];
     unsafe {
@@ -45,7 +51,7 @@ impl core::fmt::Write for WriteBuf {
         let s_len = s.len();
 
         if s_len + self.offset >= MAX_PATH {
-            syscalls::write(2, "String too long!");
+            syscalls::write(2, "String too long!").unwrap();
             return Err(core::fmt::Error);
         }
 
@@ -83,10 +89,11 @@ macro_rules! print {
 
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
-	let result = crate::syscalls::write(1, buf.data);
-	assert!(result == buf.data.len() as i32);
+	let result = crate::syscalls::write(1, buf.data).unwrap();
+	assert!(result == buf.data.len() as u32);
     };
 }
+
 
 #[macro_export]
 macro_rules! dbg {
@@ -97,8 +104,8 @@ macro_rules! dbg {
 	    .expect("debug");
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
-	let result = crate::syscalls::write(2, buf.data);
-	assert!(result == buf.data.len() as i32);
+	let result = crate::syscalls::write(2, buf.data).unwrap();
+	assert!(result == buf.data.len() as u32);
     };
 }
 

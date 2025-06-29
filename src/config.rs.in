@@ -1,0 +1,2 @@
+// @configure_input@
+pub const VERSION: &'static str = "@PACKAGE_STRING@";

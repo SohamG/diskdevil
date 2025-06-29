@@ -1,21 +1,20 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
+### Setup
 AC_PREREQ([2.72])
-AC_INIT([diskdevil], [0.1], [dd@sohamg.xyz])
+m4_define([GIT_HASH], m4_esyscmd([git describe --always]))
+AC_INIT([diskdevil], m4_defn([GIT_HASH]), [dd@sohamg.xyz])
 
 AC_CONFIG_SRCDIR([src/main.rs])
 AC_CONFIG_AUX_DIR([build-aux])
-
-####HERE
 AM_INIT_AUTOMAKE([foreign nostdinc])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
-# Checks for programs.
 
+### Check Programs
 AC_PROG_GREP
 AC_ARG_VAR([RUSTC], [Location of rustc compiler])
 
-dnl AC_MSG_CHECKING([if rustc compiler can be found])
 AC_PATH_PROG([RUSTC], [rustc], [none])
 
 AS_IF([test "x$RUSTC" = xnone], [AC_MSG_ERROR([No rustc in PATH!])])
@@ -59,8 +58,9 @@ CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -P"
 
 AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 
+### Finish up
 AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS src/numbers.cpp.rs -o src/numbers.rs], [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
-AC_CONFIG_FILES([rust-project.json Makefile src/Makefile ])
+AC_CONFIG_FILES([rust-project.json Makefile src/Makefile src/config.rs])
 
 AC_OUTPUT

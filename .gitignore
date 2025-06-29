@@ -158,3 +158,4 @@ pfx
 *.log
 *.trs
 *.test
+/src/config.rs
