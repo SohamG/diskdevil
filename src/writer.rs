@@ -1,17 +1,33 @@
 extern crate core;
-use core::fmt::{Display, Write};
 use crate::numbers::*;
 use crate::syscalls;
+use core::convert::Into;
+use core::fmt::{Debug,Display, Write};
+use core::str::Utf8Error;
+use core::cmp::Eq;
 
 pub struct WriteBuf {
     pub data: [u8; MAX_PATH],
     offset: usize,
 }
 
+impl PartialEq<&str> for WriteBuf {
+    fn eq(&self, other: &&str) -> bool {
+	let s = core::str::from_utf8(&self.data[..self.offset]).unwrap();
+	s == *other
+    }
+}
+
+impl Debug for WriteBuf {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+	<Self as Display>::fmt(&self, f)
+    }
+}
+
 pub fn new() -> WriteBuf {
     let data: [u8; MAX_PATH];
-    unsafe{
-	data = core::mem::zeroed();
+    unsafe {
+        data = core::mem::zeroed();
     }
     let offset = 0;
 
@@ -26,22 +42,25 @@ pub fn new_str(s: impl Display) -> WriteBuf {
 
 impl core::fmt::Write for WriteBuf {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-            let s_len = s.len();
+        let s_len = s.len();
 
-            if s_len + self.offset >= MAX_PATH {
-                syscalls::write(2, "String too long!");
-                return Err(core::fmt::Error);
-            }
+        if s_len + self.offset >= MAX_PATH {
+            syscalls::write(2, "String too long!");
+            return Err(core::fmt::Error);
+        }
 
-            // syscalls::write(2, "> writebuf\n");
-
+        // syscalls::write(2, "> writebuf\n");
 
         unsafe {
             // asm::movsb(s, &mut self.data[self.offset..], s_len);
-	    core::ptr::copy_nonoverlapping(s.as_ptr(), self.data[self.offset..].as_mut_ptr(), s_len);
+            core::ptr::copy_nonoverlapping(
+                s.as_ptr(),
+                self.data[self.offset..].as_mut_ptr(),
+                s_len,
+            );
         }
 
-            self.offset += s_len;
+        self.offset += s_len;
 
         Ok(())
     }
@@ -49,10 +68,13 @@ impl core::fmt::Write for WriteBuf {
 
 impl Display for WriteBuf {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-	write!(f, "{}", core::str::from_utf8(&self.data[..self.offset]).unwrap())
+        write!(
+            f,
+            "{}",
+            core::str::from_utf8(&self.data[..self.offset]).unwrap()
+        )
     }
 }
-
 
 #[macro_export]
 macro_rules! print {

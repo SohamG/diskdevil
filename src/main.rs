@@ -46,6 +46,8 @@ unsafe fn str_null(bytes: *const c_char) -> MyStr {
 #[cfg_attr(not(no_mangle), unsafe(no_mangle))]
 #[cfg(not(mytest))]
 pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
+    use args::CliArgs;
+
     let final_args = &unsafe {
         let argv_slice = from_raw_parts(argv, argc as usize);
         let mut ans: [MyStr; MAX_ARG] = [&(c""); MAX_ARG];
@@ -55,16 +57,9 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	ans
     }[..argc];
 
-    
-    writer::debug("🦀Args:");
-    writer::debug(final_args[0].to_str().unwrap());
-    writer::debug(final_args[1].to_str().unwrap());
+    let cli = CliArgs::parse(final_args);
 
-    print!("This is a print!\n");
-    print!("This is a {} print with args!!\n", final_args[1].to_str().unwrap());
-    dbg!("This is debug lol {} {}", 6, 9);
-
-    bail!(-1, "Testing bailing out! {} ", final_args[0].to_str().unwrap());
+    dbg!("{:?}", cli);
 
     syscalls::exit(0)
 }
@@ -82,7 +77,7 @@ fn mypanic(info: &core::panic::PanicInfo) -> ! {
 pub fn main() {
     use std::*;
     use crate::args;
-    println!("1..{}", 3);
+    println!("1..{}", 5);
     let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
 
     if res > 0 {
@@ -120,6 +115,22 @@ pub fn main() {
 	    println!("ok 4 - cli with -h");
 	}
     };
+
+    let myargs3 = TryInto::<args::CliArgs>::try_into(&[c"foo", c"/tmp", c"kjkjkjh", c"fooo"] as &[MyStr]);
+
+    let arg3s = "cli args too many args";
+    match myargs3 {
+	Ok(_) => {
+	    println!("not ok 5 - returned ok {arg3s}");
+	},
+	Err(e) => {
+	    if e == args::ERR_TOO_MANY {
+		println!("ok 5 - {arg3s}");
+	    } else {
+		println!("not ok 5 - error msg incorrect {arg3s} {e}");
+	    }
+	}
+    }
 
     
 
