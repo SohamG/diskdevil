@@ -7,6 +7,7 @@ pub mod numbers;
 pub mod args;
 pub mod config;
 pub mod syscalls;
+use std::fmt::{Debug,Display};
 
 #[macro_use]
 pub mod writer;
@@ -15,8 +16,10 @@ pub mod writer;
 pub const MAX_ARG: usize = 10;
 pub type MyStr = &'static core::ffi::CStr;
 
+static TEST_COUNT: i32 = 9;
+
 pub fn main() {
-    println!("1..{}", 6);
+    println!("1..{}", TEST_COUNT);
     let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
 
     if let Ok(r) = res {
@@ -24,6 +27,7 @@ pub fn main() {
     } else {
 	println!("not ok 1 - Syscall write returned {}", res.unwrap_err());
     }
+
 
     let res = syscalls::write(-1, "test: testing write syscall!".as_bytes());
 
@@ -88,16 +92,49 @@ pub fn main() {
     }
 
     let t = "open normal file";
+    test_result(syscalls::open(c"./main.rs", numbers::open::READ_WRITE, 0), 7, "syscall open bashrc");
+    test_result(syscalls::open_str(&"./main.rs", numbers::open::READ_WRITE, 0), 8, "syscall open bashrc");
+
+    let t = "get from fd from cli";
+
+    let cli = TryInto::<args::CliArgs>::try_into(&[c"foo", c"-", c"-"] as &[MyStr]);
 
 
-    
-
+    if fail_err(&cli, 9, t) {
+	let c = cli.unwrap();
+	match c.get_from() {
+	    Ok(0) => {
+		println!("ok 9 - {t} 0");
+	    },
+	    Err(e) => println!("not ok 9 - {t} {e:?}"),
+	    Ok(_) => println!("not ok 9 - {t} invalid Ok")
+	}
+    };
 }
 
-#[cfg(mytests)]
-pub fn test_result<T: Debug, U: Debug>(r: Result<T, U>, num: i32, desc: String) {
+
+
+
+pub fn test_result<T: Debug, U: Debug>(r: Result<T, U>, num: i32, desc: &str) {
     match r {
-	Ok(t) => println!("ok {num} - {desc} {t}"),
-	Err(u) => println!("not ok {num} - {desc} {u}"),
+	Ok(t) => println!("ok {num} - {desc} {t:?}"),
+	Err(u) => println!("not ok {num} - {desc} {u:?}"),
+    }
+}
+
+pub fn test_err<T: Debug, U: Debug>(r: Result<T, U>, num: i32, desc: &str) {
+    match r {
+	Ok(t) => println!("not ok {num} - {desc} {t:?}"),
+	Err(u) => println!("ok {num} - {desc} {u:?}"),
+    }
+}
+
+pub fn fail_err<T: Debug, U: Debug>(r: &Result<T, U>, num: i32, desc: &str) -> bool{
+    match r {
+	Err(e) => {
+	    println!("not ok {num} - {desc} {e:?}");
+	    false
+	},
+	_ => true
     }
 }

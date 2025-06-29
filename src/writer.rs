@@ -2,6 +2,7 @@ extern crate core;
 use crate::numbers::*;
 use crate::syscalls;
 use core::convert::Into;
+use core::ffi::CStr;
 use core::fmt::{Debug,Display, Write};
 use core::str::Utf8Error;
 use core::cmp::Eq;
@@ -29,6 +30,7 @@ impl WriteBuf {
 	return core::str::from_utf8(&self.data[..self.offset]).unwrap();
     }
 }
+
 
 pub fn new() -> WriteBuf {
     let data: [u8; MAX_PATH];

@@ -1,6 +1,8 @@
 extern crate core;
 use crate::config;
 use crate::numbers::*;
+use crate::numbers;
+use crate::syscalls;
 use crate::writer;
 use crate::writer::*;
 use crate::{CStr, MyStr};
@@ -108,6 +110,38 @@ impl TryFrom<&[MyStr]> for CliArgs {
 impl CliArgs {
     pub fn parse(data: &[MyStr]) -> Result<Self, <CliArgs as TryFrom<&[MyStr]>>::Error> {
         Self::try_from(data)
+    }
+
+    pub fn get_from(&self) -> Result<u32, i32> {
+	if self.from.is_none() {
+	    bail!(-2, "From value is None");
+	}
+
+	match &self.from.as_ref().unwrap() {
+	    InPath::Stdin => {
+		Ok(0)
+	    },
+	    InPath::Path(cstr) => {
+		let fd = syscalls::open(cstr, numbers::open::READ_ONLY, 0)?;
+		Ok(fd)
+	    },
+	}
+    }
+
+    pub fn get_to(&self) -> Result<u32, i32> {
+	if self.to.is_none() {
+	    bail!(-2, "to value is None");
+	}
+
+	match &self.to.as_ref().unwrap() {
+	    OutPath::Stdout => {
+		Ok(1)
+	    },
+	    OutPath::Path(cstr) => {
+		let fd = syscalls::open(cstr, numbers::open::READ_ONLY, 0)?;
+		Ok(fd)
+	    },
+	}
     }
 
     fn usage(us: MyStr) -> WriteBuf {

@@ -17,7 +17,7 @@ BUILT_SOURCES = numbers.rs config.rs
 diskdevil_CFLAGS=--target x86_64-unknown-none --cfg no_std \
 	-C relocation-model=static -C panic=abort -g --edition 2024 \
 	--crate-type=bin -C codegen-units=1 -C lto=true -C opt-level=3
-testdevil_test_CFLAGS=--cfg mytest --crate-type=bin --extern std --edition 2024
+testdevil_test_CFLAGS=--cfg mytest --crate-type=bin --extern std --edition 2024 -g
 
 
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh --color-tests yes --no-merge --comments

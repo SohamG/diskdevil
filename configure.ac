@@ -54,7 +54,11 @@ AS_IF([$CPP $CPPFLAGS -imacros "limits.h" /dev/null 2>&1 > /dev/null],
       [AC_MSG_RESULT([yes])],
       [AC_MSG_ERROR([header limits.h not found!])])
 
-CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -P"
+AS_IF([$CPP $CPPFLAGS -imacros "fcntl.h" /dev/null 2>&1 > /dev/null],
+      [AC_MSG_RESULT([yes])],
+      [AC_MSG_ERROR([header limits.h not found!])])
+
+CPPFLAGS="$CPPFLAGS -imacros asm/unistd.h -imacros limits.h -imacros fcntl.h -P"
 
 AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 

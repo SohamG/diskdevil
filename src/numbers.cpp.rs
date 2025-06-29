@@ -4,3 +4,9 @@ pub const OPEN: i32 = __NR_open;
 pub const SENDFILE: i32 = __NR_sendfile;
 pub const MAX_PATH: usize = PATH_MAX;
 
+pub mod open {
+    pub const READ_ONLY: i64 = O_RDONLY;
+    pub const WRITE_ONLY: i64 = O_WRONLY;
+    pub const READ_WRITE: i64 = O_RDWR;
+    pub const TRUNCATE: i64 = O_TRUNC;
+}
