@@ -1,2 +1,3 @@
 // @configure_input@
 pub const VERSION: &'static str = "@PACKAGE_STRING@";
+pub const DEV_RAND: &'static str = "/dev/urandom";

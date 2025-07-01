@@ -57,7 +57,7 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	ans
     }[..argc];
 
-    let cli = match CliArgs::parse(final_args) {
+    let _cli = match CliArgs::parse(final_args) {
 	Ok(c) => c,
 	Err(s) => {
 	    syscalls::write(2, s.to_str()).unwrap();
@@ -65,7 +65,6 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	}
     };
 
-    let from = 
 	
 
     syscalls::exit(0);

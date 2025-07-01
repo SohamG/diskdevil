@@ -1,11 +1,7 @@
 extern crate core;
 use crate::numbers::*;
 use crate::syscalls;
-use core::convert::Into;
-use core::ffi::CStr;
 use core::fmt::{Debug,Display, Write};
-use core::str::Utf8Error;
-use core::cmp::Eq;
 
 pub struct WriteBuf {
     pub data: [u8; MAX_PATH],

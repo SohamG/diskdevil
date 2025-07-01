@@ -1,11 +1,10 @@
 extern crate core;
 use crate::config;
-use crate::numbers::*;
 use crate::numbers;
 use crate::syscalls;
 use crate::writer;
 use crate::writer::*;
-use crate::{CStr, MyStr};
+use crate::MyStr;
 use core::fmt::{Display, Write};
 
 #[cfg(mytest)]
@@ -28,7 +27,6 @@ enum OutPath {
 
 #[derive(Debug)]
 pub struct CliArgs {
-    help: bool,
     from: Option<InPath>,
     to: Option<OutPath>,
 }
@@ -95,7 +93,6 @@ impl TryFrom<&[MyStr]> for CliArgs {
             }
             3 => {
                 return Ok(Self {
-                    help: false,
                     from: Some(value[1].into()),
                     to: Some(value[2].into()),
                 });
@@ -150,11 +147,11 @@ impl CliArgs {
             buf,
             "Usage: {} [-h|--help] INPUT OUTPUT\n",
             us.to_str().unwrap()
-        );
-        write!(buf, "\t-h --help      Show this help message\n");
-        write!(buf, "\tINPUT          Path to file OR - for stdin\n");
-        write!(buf, "\tOUTPUT         Path to file OR - for stdout\n\n");
-        write!(buf, "{}\n", config::VERSION);
+        ).expect("usage");
+        write!(buf, "\t-h --help      Show this help message\n").expect("usage");
+        write!(buf, "\tINPUT          Path to file OR - for stdin\n").expect("usage");
+        write!(buf, "\tOUTPUT         Path to file OR - for stdout\n\n").expect("usage");
+        write!(buf, "{}\n", config::VERSION).expect("usage");
 
         buf
     }

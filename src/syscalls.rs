@@ -3,6 +3,7 @@ use core::convert::AsRef;
 use core::ffi::CStr;
 use crate::numbers::*;
 use crate::writer;
+use core::fmt::Write;
 
 pub fn write(fd: i32, data: impl AsRef<[u8]>) -> Result<u32, i32> {
     let ptr = data.as_ref();
@@ -24,6 +25,7 @@ pub fn write(fd: i32, data: impl AsRef<[u8]>) -> Result<u32, i32> {
     }
 }
 
+#[allow(unreachable_code)]
 pub fn exit(code: i32) -> ! {
     // asm!("mov rax, $60", "mov rdi, ${c:r}", "syscall", c = in(reg) code, options(noreturn));
     unsafe {
@@ -54,24 +56,25 @@ pub fn open(path: &CStr, flags: i64, mode: i64) -> Result<u32, i32> {
     }
 }
 
-// pub fn sendfile(to: u32, from: u32, u32: offset, count: usize) -> Result<u32, i32> {
-//     let mut ans: i32;
-//     unsafe{
-// 	asm!("syscall",
-// 	     in("rax") SENDFILE => ans,
-// 	     in("rdi") to,
-// 	     in("rsi") from,
-// 	     in("rdx") offset,
-// 	     in("r10") count
-// 	);
-//     };
+pub fn sendfile(to: i32, from: i32, offset: i32, count: usize) -> Result<u32, i32> {
+    let mut ans: i32 = 69696969;
+    dbg!("to {} from {} offset {} count {}", to, from, offset, count);
+    unsafe{
+	asm!("syscall",
+	     inout("rax") SENDFILE => ans,
+	     in("rdi") to,
+	     in("rsi") from,
+	     in("rdx") 0,
+	     in("r10") count
+	);
+    };
 
-//     if ans >= 0 {
-// 	Ok(ans as u32)
-//     } else {
-// 	Err(ans as i32)
-//     }
-// }
+    if ans >= 0 {
+	return Ok(ans as u32);
+    } else  {
+	return Err(ans as i32);
+    }
+}
 
 pub fn open_str(path: &str, flags: i64, mode: i64) -> Result<u32, i32> {
     let cs = unsafe{
