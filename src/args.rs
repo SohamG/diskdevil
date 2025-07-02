@@ -127,7 +127,7 @@ impl CliArgs {
         Self::try_from(data)
     }
 
-    pub fn get_from(&self) -> Result<u32, i32> {
+    pub fn get_from(&self) -> syscalls::Result {
 
 	match &self.from {
 	    InPath::Stdin => {
@@ -140,7 +140,7 @@ impl CliArgs {
 	}
     }
 
-    pub fn get_to(&self) -> Result<u32, i32> {
+    pub fn get_to(&self) -> syscalls::Result {
 
 	match &self.to {
 	    OutPath::Stdout => {

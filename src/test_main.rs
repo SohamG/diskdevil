@@ -9,6 +9,7 @@ pub mod asm;
 pub mod config;
 pub mod numbers;
 pub mod syscalls;
+pub mod colours;
 use std::fmt::Debug;
 use std::fs;
 
@@ -19,7 +20,7 @@ pub const MAX_ARG: usize = 10;
 pub type MyStr = &'static core::ffi::CStr;
 
 pub fn main() {
-    println!("TAP Version 14");
+    // println!("TAP Version 14");
     let mut count = 0;
     let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
     count += 1;
@@ -50,7 +51,7 @@ pub fn main() {
 
     match myargs {
         Ok(a) => {
-            println!("ok {count} - try into for cliargs works {}", a);
+            println!("ok {count} - try into for cliargs works {:?}", a);
         }
         Err(e) => {
             println!("not ok {count} - try into produced {}", e);
@@ -141,6 +142,9 @@ pub fn main() {
     count += 1;
     test_sendfile_all(&mut count);
 
+    count += 1;
+    test_lseek(&mut count);
+
     println!("1..{}", count);
 }
 
@@ -166,6 +170,43 @@ pub fn fail_err<T: Debug, U: Debug>(r: &Result<T, U>, num: i32, desc: &str) -> b
         }
         _ => true,
     }
+}
+
+fn test_lseek(count: &mut i32) {
+    let t = "ensure lseek returns size of file";
+    delete_files(&["lseek.size"]);
+
+    let mut f = fs::File::create_new("lseek.size").unwrap();
+
+    f.set_len(1024).unwrap();
+
+    let sz = syscalls::lseek(f.as_raw_fd(), 0, numbers::lseek::END).unwrap();
+
+    let mut pass = false;
+
+    pass = (sz == 1024);
+
+    f.set_len(8192).unwrap();
+
+    let sz2 = syscalls::lseek(f.as_raw_fd(), 0, numbers::lseek::END).unwrap();
+
+    pass = pass && (sz2 == 8192);
+
+    f.set_len(5).unwrap();
+
+    let sz3 = syscalls::lseek(f.as_raw_fd(), 0, numbers::lseek::END).unwrap();
+
+    pass = pass && (sz3 == 5);
+
+
+    if pass {
+	println!("ok {count} - {t}");
+    } else {
+	println!("not ok {count} - {t} wrong size");
+    }
+
+    delete_files(&["lseek.size"]);
+
 }
 
 pub fn test_sendfile_all(count: &mut i32) {

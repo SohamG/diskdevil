@@ -88,7 +88,7 @@ macro_rules! print {
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
 	let result = crate::syscalls::write(1, buf.data).unwrap();
-	assert!(result == buf.data.len() as u32);
+	assert!(result as usize == buf.data.len());
     };
 }
 
@@ -103,7 +103,7 @@ macro_rules! dbg {
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
 	let result = crate::syscalls::write(2, buf.data).unwrap();
-	assert!(result == buf.data.len() as u32);
+	assert!(result as usize == buf.data.len());
     };
 }
 

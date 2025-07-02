@@ -43,7 +43,7 @@ unsafe fn str_null(bytes: *const c_char) -> MyStr {
     }
 }
 
-fn file_size(fd: u32) -> u64 {
+fn file_size(fd: u64) -> u64 {
     syscalls::lseek(fd.try_into().unwrap(), 0, numbers::lseek::END)
 	.expect("Could not determine size of file")
 }
