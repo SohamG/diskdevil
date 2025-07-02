@@ -73,7 +73,7 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 
 //Required for `#![no_std]`
 #[cfg(not(mytest))]
-#[cfg(no_std)]
+#[cfg(no_std)] // this is to stop rust analyzer from having a menty b
 #[panic_handler]
 fn mypanic(info: &core::panic::PanicInfo) -> ! {
     bail!(-100, "{}", info.message());

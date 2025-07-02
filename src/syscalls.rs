@@ -1,8 +1,10 @@
+#![cfg_attr(mytest, allow(unused_imports))]
+
+use crate::numbers::*;
+use crate::writer;
 use core::arch::asm;
 use core::convert::AsRef;
 use core::ffi::CStr;
-use crate::numbers::*;
-use crate::writer;
 use core::fmt::Write;
 
 pub fn write(fd: i32, data: impl AsRef<[u8]>) -> Result<u32, i32> {
@@ -19,9 +21,9 @@ pub fn write(fd: i32, data: impl AsRef<[u8]>) -> Result<u32, i32> {
 	 lateout("r11") _);
     }
     if result >= 0 {
-	Ok(result as u32)
+        Ok(result as u32)
     } else {
-	Err(result)
+        Err(result)
     }
 }
 
@@ -41,48 +43,54 @@ pub fn open(path: &CStr, flags: i64, mode: i64) -> Result<u32, i32> {
     let mut result: i32;
     use core::fmt::Write;
     unsafe {
-	asm!("syscall",
-	     inout("rax") OPEN => result,
-	     in("rdi") path.as_ptr(),
-	     in("rsi") flags,
-	     in("rdx") mode
-	);
+        asm!("syscall",
+             inout("rax") OPEN => result,
+             in("rdi") path.as_ptr(),
+             in("rsi") flags,
+             in("rdx") mode
+        );
     };
-    dbg!("{}",result);
+    dbg!("{}", result);
     if result > 0 {
-	return Ok(result as u32);
+        return Ok(result as u32);
     } else {
-	return Err(result);
+        return Err(result);
     }
 }
 
-pub fn sendfile(to: i32, from: i32, offset: i32, count: usize) -> Result<u32, i32> {
-    let mut ans: i32 = 69696969;
+pub fn sendfile(to: i32, from: i32, offset: u64, count: u64) -> Result<u64, i32> {
+    #[allow(unused_assignments)]
+    let mut ans: i64 = 69696969;
     dbg!("to {} from {} offset {} count {}", to, from, offset, count);
-    unsafe{
-	asm!("syscall",
-	     inout("rax") SENDFILE => ans,
-	     in("rdi") to,
-	     in("rsi") from,
-	     in("rdx") 0,
-	     in("r10") count
-	);
+    unsafe {
+        asm!("syscall",
+             inout("rax") SENDFILE as i64 => ans,
+             in("rdi") to,
+             in("rsi") from,
+             in("rdx") offset,
+             in("r10") if cfg!(mytest) {1024} else {count},
+        );
     };
 
     if ans >= 0 {
-	return Ok(ans as u32);
-    } else  {
-	return Err(ans as i32);
+        return Ok(ans as u64);
+    } else {
+        return Err(ans as i32);
     }
 }
 
 pub fn open_str(path: &str, flags: i64, mode: i64) -> Result<u32, i32> {
-    let cs = unsafe{
-	let b = writer::new_str(path);
-	CStr::from_ptr(b.data.as_ptr() as *const i8)
+    let cs = unsafe {
+        let b = writer::new_str(path);
+        CStr::from_ptr(b.data.as_ptr() as *const i8)
     };
     open(cs, flags, mode)
 }
 
-
-
+pub fn sendfile_all(to: i32, from: i32, count: u64) -> Result<u64, i32> {
+    let mut sent: u64 = 0u64;
+    while sent != count {
+        sent += sendfile(to, from, 0, count)?;
+    }
+    return Ok(sent);
+}

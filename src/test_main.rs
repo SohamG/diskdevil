@@ -1,5 +1,7 @@
 use std::*;
 
+use std::io::{Read, Write, Seek};
+use std::os::fd::AsRawFd;
 extern crate core;
 pub use core::ffi::CStr;
 pub mod args;
@@ -34,7 +36,7 @@ pub fn main() {
     let res = syscalls::write(-1, "test: testing write syscall!".as_bytes());
     count += 1;
 
-    if let Ok(r) = res {
+    if let Ok(_) = res {
         println!("not ok {count} - Syscall should have failed!");
     } else {
         println!(
@@ -60,10 +62,10 @@ pub fn main() {
     count += 1;
 
     match myargs2 {
-        Ok(a) => {
+        Ok(_) => {
             println!("not ok {count} - cli with -h");
         }
-        Err(e) => {
+        Err(_e) => {
             println!("ok {count} - cli with -h");
         }
     };
@@ -108,13 +110,13 @@ pub fn main() {
     test_result(
         syscalls::open(c"./main.rs", numbers::open::READ_WRITE, 0),
         count,
-        "syscall open bashrc",
+        t
     );
     count += 1;
     test_result(
         syscalls::open_str(&"./main.rs", numbers::open::READ_WRITE, 0),
         count,
-        "syscall open bashrc",
+	t
     );
 
     let t = "get from fd from cli";
@@ -135,6 +137,9 @@ pub fn main() {
 
     count += 1;
     test_sendfile(&mut count);
+
+    count += 1;
+    test_sendfile_all(&mut count);
 
     println!("1..{}", count);
 }
@@ -163,13 +168,56 @@ pub fn fail_err<T: Debug, U: Debug>(r: &Result<T, U>, num: i32, desc: &str) -> b
     }
 }
 
+pub fn test_sendfile_all(count: &mut i32) {
+    use std::path::PathBuf;
+    use std::process::*;
+
+    let t = "sendfile all";
+
+    delete_files(&["sfmany.bin"]);
+
+    let mut pb = PathBuf::new();
+    pb.push(config::TEST_DATA);
+    pb.push("libxz-v5.6.0-test-data.bin");
+
+
+    let data = fs::File::open(&pb).unwrap();
+
+    let out = fs::File::create_new("sfmany.bin").unwrap();
+
+    // out.set_len(11095);
+
+    let res = syscalls::sendfile_all(out.as_raw_fd(), data.as_raw_fd(), 11095);
+
+    if let Err(e) = res {
+	println!("not ok {count} - {t} {e:?}");
+    }
+
+    let bytes = res.unwrap();
+
+    out.sync_all().unwrap();
+
+    let same = Command::new("diff")
+        .arg("-q")
+        .arg(pb)
+        .arg("sfmany.bin")
+        .status()
+        .expect("Error running diff command");
+
+    if same.success() {
+	println!("ok {count} - {t} {bytes} bytes are same");
+    } else {
+	println!("not ok {count} - {t} files differ");
+    }
+    
+    delete_files(&["sfmany.bin"]);
+
+}
+
 pub fn test_sendfile(count: &mut i32) {
-    use std::io::{Read, Write, Seek};
-    use std::os::fd::AsRawFd;
     let test = "check sendfile short write";
     
-    let _ = fs::remove_file("sf1.txt");
-    let _ = fs::remove_file("sf2.txt");
+    delete_files(&["sf1.txt", "sf2.txt"]);
     let mut f1 = fs::File::create_new("sf1.txt").unwrap();
     let mut f2 = fs::File::create_new("sf2.txt").unwrap();
 
@@ -186,17 +234,14 @@ pub fn test_sendfile(count: &mut i32) {
     f1.rewind().unwrap();
 
     f1.sync_all().unwrap();
-    let sysresult;
-    unsafe{
-	sysresult = syscalls::sendfile(f2.as_raw_fd().into(), f1.as_raw_fd().into(), 0, 1024);
-    }
+    let sysresult = syscalls::sendfile(f2.as_raw_fd().into(), f1.as_raw_fd().into(), 0, 1024);
 
     match sysresult {
 	Ok(1024) => {
 	    println!("ok {count} - {test}");
 	},
 	Ok(o) => {
-	    println!("not ok {count} - {test} short write {o}");
+	    println!("not ok {count} - {test} short write with 1024 bytes {o}");
 	    return;
 	},
 	Err(e) => {
@@ -206,7 +251,7 @@ pub fn test_sendfile(count: &mut i32) {
     };
 
     *count += 1;
-    let test = "check contents of files";
+    let test = "check contents of files with 1024 bytes";
 
     f1.sync_all().unwrap();
     f2.sync_all().unwrap();
@@ -224,9 +269,15 @@ pub fn test_sendfile(count: &mut i32) {
 	println!("not ok {count} - {test} contents not same");
     }
 
-    fs::remove_file("sf1.txt").unwrap();
-    fs::remove_file("sf2.txt").unwrap();
+    delete_files(&["sf1.txt", "sf2.txt"]);
 
 
     
+}
+
+pub fn delete_files(files: &[&str]) {
+    for file in files {
+	let _ = fs::remove_file(file);
+    }
+
 }

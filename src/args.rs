@@ -27,8 +27,8 @@ enum OutPath {
 
 #[derive(Debug)]
 pub struct CliArgs {
-    from: Option<InPath>,
-    to: Option<OutPath>,
+    from: InPath,
+    to: OutPath,
 }
 
 // impl<T: Display> Display for Option<T> {
@@ -93,8 +93,8 @@ impl TryFrom<&[MyStr]> for CliArgs {
             }
             3 => {
                 return Ok(Self {
-                    from: Some(value[1].into()),
-                    to: Some(value[2].into()),
+                    from: value[1].into(),
+                    to: value[2].into(),
                 });
             }
             _ => {
@@ -110,11 +110,8 @@ impl CliArgs {
     }
 
     pub fn get_from(&self) -> Result<u32, i32> {
-	if self.from.is_none() {
-	    bail!(-2, "From value is None");
-	}
 
-	match &self.from.as_ref().unwrap() {
+	match &self.from {
 	    InPath::Stdin => {
 		Ok(0)
 	    },
@@ -126,11 +123,8 @@ impl CliArgs {
     }
 
     pub fn get_to(&self) -> Result<u32, i32> {
-	if self.to.is_none() {
-	    bail!(-2, "to value is None");
-	}
 
-	match &self.to.as_ref().unwrap() {
+	match &self.to {
 	    OutPath::Stdout => {
 		Ok(1)
 	    },
