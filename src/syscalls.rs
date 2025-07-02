@@ -50,7 +50,6 @@ pub fn open(path: &CStr, flags: i64, mode: i64) -> Result<u32, i32> {
              in("rdx") mode
         );
     };
-    dbg!("{}", result);
     if result > 0 {
         return Ok(result as u32);
     } else {
@@ -61,7 +60,6 @@ pub fn open(path: &CStr, flags: i64, mode: i64) -> Result<u32, i32> {
 pub fn sendfile(to: i32, from: i32, offset: u64, count: u64) -> Result<u64, i32> {
     #[allow(unused_assignments)]
     let mut ans: i64 = 69696969;
-    dbg!("to {} from {} offset {} count {}", to, from, offset, count);
     unsafe {
         asm!("syscall",
              inout("rax") SENDFILE as i64 => ans,
@@ -78,6 +76,27 @@ pub fn sendfile(to: i32, from: i32, offset: u64, count: u64) -> Result<u64, i32>
         return Err(ans as i32);
     }
 }
+
+pub fn lseek(fd: i32, offset: usize, whence: u32) -> Result<u64, i32> {
+    let mut ans = 69699696;
+
+    unsafe{
+	asm!("syscall",
+	     inout("rax") LSEEK => ans,
+	     in("rdi") fd,
+	     in("rsi") offset,
+	     in("rdx") whence
+	);
+    };
+    if ans >= 0 {
+	return Ok(ans as u64);
+    } else {
+	return Err(ans as i32);
+    };
+}
+
+
+
 
 pub fn open_str(path: &str, flags: i64, mode: i64) -> Result<u32, i32> {
     let cs = unsafe {

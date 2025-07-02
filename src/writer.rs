@@ -98,8 +98,8 @@ macro_rules! dbg {
     ($f:literal $(,)? $($a:expr),*) => {
         let mut buf = crate::writer::new();
 
-	write!(buf, "Debug:{}:{}:{}: ", file!(), line!(), column!())
-	    .expect("debug");
+	// write!(buf, "Debug:{}:{}:{}: ", file!(), line!(), column!())
+	//     .expect("debug");
 	write!(buf, $f, $( $a ),*).expect("print");
 	write!(buf, "\n").expect("print");
 	let result = crate::syscalls::write(2, buf.data).unwrap();
@@ -110,9 +110,11 @@ macro_rules! dbg {
 #[macro_export]
 macro_rules! bail {
     ($code:expr $(,$f:literal $(,)? $($a:expr),*)?) => {
+	{
 	let exit_code: i32 = $code;
 	$(crate::dbg!($f, $($a),*);)?
 	crate::syscalls::exit(exit_code);
+	}
     };
 }
 

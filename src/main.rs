@@ -18,7 +18,7 @@ pub mod numbers;
 pub mod args;
 pub mod config;
 pub mod syscalls;
-
+pub mod colours;
 
 pub use crate::numbers::*;
 
@@ -43,6 +43,11 @@ unsafe fn str_null(bytes: *const c_char) -> MyStr {
     }
 }
 
+fn file_size(fd: u32) -> u64 {
+    syscalls::lseek(fd.try_into().unwrap(), 0, numbers::lseek::END)
+	.expect("Could not determine size of file")
+}
+
 #[cfg_attr(not(no_mangle), unsafe(no_mangle))]
 #[cfg(not(mytest))]
 pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
@@ -57,7 +62,7 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	ans
     }[..argc];
 
-    let _cli = match CliArgs::parse(final_args) {
+    let cli = match CliArgs::parse(final_args) {
 	Ok(c) => c,
 	Err(s) => {
 	    syscalls::write(2, s.to_str()).unwrap();
@@ -65,6 +70,39 @@ pub unsafe extern "C" fn main(argc: usize, argv:  *const *const c_char) -> ! {
 	}
     };
 
+    print!("{}", cli);
+
+    let from_fd = match cli.get_from() {
+        Ok(fd) => fd,
+        Err(e) => {
+	    bail!(-1, "Could not open source file {}{}{}, open returned {}",
+		  colours::UNDERLINE,
+		  cli.from,
+		  colours::RESET,
+		  e)
+	},
+    };
+
+    let to_fd = match cli.get_to() {
+        Ok(fd) => fd,
+        Err(e) => {
+	    bail!(-1, "Could not open destination file {}{}{}, open returned {}",
+		  colours::UNDERLINE,
+		  cli.from,
+		  colours::RESET,
+		  e)
+	},
+    };
+
+    let from_sz = file_size(from_fd);
+
+    print!("Size of input file is {} bytes", from_sz);
+
+    // let res = syscalls::sendfile_all(to_fd, from_fd, count)
+    
+
+    
+    
 	
 
     syscalls::exit(0);

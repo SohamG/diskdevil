@@ -5,6 +5,7 @@ use crate::syscalls;
 use crate::writer;
 use crate::writer::*;
 use crate::MyStr;
+use crate::colours;
 use core::fmt::{Display, Write};
 
 #[cfg(mytest)]
@@ -14,37 +15,54 @@ pub const ERR_TOO_MANY: &'static str = "Too many arguments!";
 pub const ERR_TOO_FEW: &'static str = "Too few arguments! Run without args for help.";
 
 #[derive(Debug)]
-enum InPath {
+pub enum InPath {
     Stdin,
     Path(MyStr),
 }
 
 #[derive(Debug)]
-enum OutPath {
+pub enum OutPath {
     Stdout,
     Path(MyStr),
 }
 
 #[derive(Debug)]
 pub struct CliArgs {
-    from: InPath,
-    to: OutPath,
+    pub from: InPath,
+    pub to: OutPath,
 }
 
-// impl<T: Display> Display for Option<T> {
-//     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-// 	match self {
-// 	    Some(t) => write!(f, "{}", t),
-// 	    None => write!(f, "None")
-// 	}
-//     }
-// }
+impl Display for InPath {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+	match self {
+	    InPath::Stdin => write!(f, "stdin"),
+	    InPath::Path(cstr) => write!(f, "{}", cstr.to_str().unwrap())
+	}
+    }
+}
+
+impl Display for OutPath {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+	match self {
+	    OutPath::Stdout => write!(f, "stdout"),
+	    OutPath::Path(cstr) => write!(f, "{}", cstr.to_str().unwrap())
+	}
+    }
+}
 
 impl Display for CliArgs {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{:?}", self)
+	write!(f, "👹 Writing from {}{}{} to {}{}{}...",
+	       colours::FG_BRIGHT_GREEN,
+	       self.from,
+	       colours::RESET,
+	       colours::FG_BRIGHT_RED,
+	       self.to,
+	       colours::RESET
+	)
     }
 }
+
 
 impl From<MyStr> for InPath {
     fn from(value: MyStr) -> Self {
