@@ -21,17 +21,7 @@ jobs:
       - name: Run make dist
         run: nix develop .# --command bash -c "autoreconf -vif && ./configure && make dist"
 
-      - name: Find tarball
-        id: find_tarball
-        run: |
-          file=$(ls *.tar.* | head -n1)
-          echo "file=$file" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: ${{ steps.find_tarball.outputs.file }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: "*.tar.gz"
