@@ -1,0 +1,17 @@
+name: Run Tests
+
+on: [push,workflow_dispatch]
+
+jobs:
+  tests:
+    name: Run TAP tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Run make check
+        run: nix --quiet develop .# --command bash -c "autoreconf -if && ./configure -q && make -s check" 2>&- | tee "$GITHUB_STEP_SUMMARY"

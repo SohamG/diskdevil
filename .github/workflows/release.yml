@@ -19,7 +19,7 @@ jobs:
       - uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Run make dist
-        run: nix develop .# --command bash -c "autoreconf -vif && ./configure && make dist"
+        run: nix develop .# --command bash -c "autoreconf -vif && ./configure && make dist" 2>&1 | tee "$GITHUB_STEP_SUMMARY"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
