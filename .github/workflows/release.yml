@@ -5,6 +5,8 @@ on:
     tags:
       - 'v*'
 
+  workflow_dispatch:
+
 jobs:
   build-and-release:
     name: Build and Create GitHub Release
@@ -18,7 +20,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y build-essential autotools-dev autoconf automake
 
       - name: Run make dist
-        run: make dist
+        run: autoreconf -vif && ./configure && make dist
 
       - name: Find tarball
         id: find_tarball
