@@ -20,7 +20,7 @@ pub const MAX_ARG: usize = 10;
 pub type MyStr = &'static core::ffi::CStr;
 
 pub fn main() {
-    // println!("TAP Version 14");
+    println!("TAP Version 14");
     let mut count = 0;
     let res = syscalls::write(2, "test: testing write syscall!".as_bytes());
     count += 1;

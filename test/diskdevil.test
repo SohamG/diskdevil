@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+# -*- mode: bash-ts-mode; -*-
+
+echo "TAP Version 14"
+
+count=1
+
+command -v diskdevil && echo "ok ${count} - found binary" || echo "not ok ${count}"
+
+count=$((count + 1))
+
+help="$(diskdevil 2>&1)"
+
+
+if test "$?" = 0; then
+    echo "not ok $count - returned 0 with no args";
+else
+    case "$help" in
+	*help*) echo "ok $count - showed help with no args";;
+	*) echo "not ok $count - improper help message";;
+    esac
+fi
+count=$((count + 1))
+
+str="lmaorustnostdpoggers"
+
+file="$(mktemp 2>&1)"
+
+echo "$str" > "$file"
+
+test2=`diskdevil ${file} -`
+
+if test "$?" != 0; then
+    echo "not ok $count - sendfile to stdout exit code $?"
+else
+    if (echo "${test2}" | grep -q "$str"); then
+	echo "ok $count - sendfile to stdout";
+    else
+	echo "not ok $count - sendfile to stdout grep failed";
+    fi
+fi
+
+
+
+echo "1..${count}";

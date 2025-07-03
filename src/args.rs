@@ -147,7 +147,7 @@ impl CliArgs {
 		Ok(1)
 	    },
 	    OutPath::Path(cstr) => {
-		let fd = syscalls::open(cstr, numbers::open::READ_ONLY, 0)?;
+		let fd = syscalls::open(cstr, numbers::open::READ_WRITE, 0666)?;
 		Ok(fd)
 	    },
 	}

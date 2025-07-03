@@ -89,7 +89,12 @@ AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS src/numbers.cpp.rs -o src/numbers.rs],
 			  [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
-AC_CONFIG_FILES([rust-project.json Makefile src/Makefile src/config.rs])
+AC_CONFIG_FILES([rust-project.json
+		Makefile
+		src/Makefile
+		src/config.rs
+		test/Makefile
+		])
 
 
 AC_OUTPUT
