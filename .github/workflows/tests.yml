@@ -14,4 +14,4 @@ jobs:
       - uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Run make check
-        run: nix --quiet develop .# --command bash -c "autoreconf -if && ./configure -q && make -s check" 2>&- | tee "$GITHUB_STEP_SUMMARY"
+        run: nix --quiet develop .# --command bash -c "autoreconf -if && ./configure -q && make -s check" 2>&1 > $GITHUB_STEP_SUMMARY

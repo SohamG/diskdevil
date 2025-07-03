@@ -1,5 +1,11 @@
 #+TITLE: diskdevil - Devilishly fast ISO to USB
 
+#+NAME: Tests Passing
+#+CAPTION: Status of tests
+[[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]]
+
+# (https://github.com/SohamG/diskdevil/actions/workflows/tests.yml)
+
 * Introduction
 Diskdevil is a fancy wrapper for the =sendfile64= system call on linux,
 enabling super fast zero-copy file transfers. Learn more about sendfile
