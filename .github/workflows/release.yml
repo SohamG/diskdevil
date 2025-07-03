@@ -16,11 +16,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up build environment
-        run: sudo apt-get update && sudo apt-get install -y build-essential autotools-dev autoconf automake
+      - uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Run make dist
-        run: autoreconf -vif && ./configure && make dist
+        run: nix develop .# --command bash -c "autoreconf -vif && ./configure && make dist"
 
       - name: Find tarball
         id: find_tarball
