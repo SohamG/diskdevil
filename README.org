@@ -2,9 +2,9 @@
 
 #+NAME: Tests Passing
 #+CAPTION: Status of tests
-[[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]]
+[[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml][https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]]
 
-# (https://github.com/SohamG/diskdevil/actions/workflows/tests.yml)
+-------------
 
 * Introduction
 Diskdevil is a fancy wrapper for the =sendfile64= system call on linux,
@@ -16,31 +16,41 @@ Grab a release tarball, and
 #+BEGIN_SRC sh
   ./configure && make && make install
 #+END_SRC
+ You will need rust target =x86_64-unknown-none=.
 
-* Doesn't DD already do this?
-Well yes, and that is the inspiration for the name __d__isk__devil__. However,
-=dd= is approximately 25 centuries old and only uses read/write system calls [1].
+
+* FAQ
+
+** Doesn't DD already do this?
+
+Well yes, and that is the inspiration for the name _d_​isk​_d_​evil. However,
+=dd= is approximately 25 centuries old and only uses read/write system calls [fn:1].
 Diskdevil does not (and probably will not) support all of the disk-destroying
 capabilities of =dd=, but *should* be faster at what basically everyone uses
 =dd= for, to dump Linux ISOs to USBs.
 
-* Can't you write a syscall wrapper in like 5 lines?
+** Can't you write a syscall wrapper in like 5 lines?
+
 Also yes, but I wanted a challege (read: procrastinate) so I decided to make it
 =no_std= ie no rust standard lib apart from =core=, no =libc=, no nothing. Just
 me and some inline assembly.
 
-I also wrote it __WITHOUT__ cargo for......reasons.
+I also wrote it _WITHOUT_ cargo for......reasons.
 
-* What's all this ./configure crap?
+** What's all this ./configure crap?
+
 What's [[./Cargo.toml][Cargo]]?
 
-* Why write it in Rust?
+** Why write it in Rust?
+
 The white house told me to? Safety or something.
 
-* How can you get the safety of rust if theres a bunch of inline asm and everything is unsafe?
+** How can you get the safety of rust if theres a bunch of inline asm and everything is unsafe?
+
 What's with all these questions?
 
+----------------------------
 * LICENSE
 [[./LICENSE][GPLv3]] especially the "AS-IS" and "no warranty" parts.
 
-[1]: Citation needed.
+[fn:1]: Citation needed.
