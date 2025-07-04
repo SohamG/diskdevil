@@ -15,4 +15,4 @@ jobs:
 
       - name: Run make check
         run: |
-          nix --quiet develop .# --command bash -c ".github/tests.sh" 
+          nix --quiet develop .# --command bash .github/tests.sh
