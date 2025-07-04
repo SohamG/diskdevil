@@ -63,6 +63,7 @@
               linuxHeaders
               act
               moreutils
+              rust-stuff
             ];
 
             # R = "${inputs'.fenix.packages.targets.x86_64-unknown-none.stable.completeToolchain}";
