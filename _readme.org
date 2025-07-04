@@ -1,15 +1,11 @@
 #+TITLE: diskdevil - Devilishly fast ISO to USB
-
-#+NAME: Tests Passing
-#+CAPTION: Status of tests
-[[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml][https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]]
-
+#+EXPORT_FILE_NAME: README
 -------------
 
 * Introduction
-Diskdevil is a fancy wrapper for the =sendfile64= system call on linux,
-enabling super fast zero-copy file transfers. Learn more about sendfile
-by consulting your local `man` command.
+Diskdevil is a fancy wrapper for the =sendfile64= system call on linux, enabling
+super fast zero-copy file transfers. Learn more about sendfile by consulting
+your local `man` command.
 
 ** Installing
 Grab a release tarball, and
@@ -23,8 +19,8 @@ Grab a release tarball, and
 
 ** Doesn't DD already do this?
 
-Well yes, and that is the inspiration for the name _d_​isk​_d_​evil. However,
-=dd= is approximately 25 centuries old and only uses read/write system calls [fn:1].
+Well yes, and that is the inspiration for the name _d_​isk​_d_​evil. However, =dd=
+is approximately 25 centuries old and only uses read/write system calls [fn:1].
 Diskdevil does not (and probably will not) support all of the disk-destroying
 capabilities of =dd=, but *should* be faster at what basically everyone uses
 =dd= for, to dump Linux ISOs to USBs.
@@ -48,6 +44,10 @@ The white house told me to? Safety or something.
 ** How can you get the safety of rust if theres a bunch of inline asm and everything is unsafe?
 
 What's with all these questions?
+
+** Why is the readme looking weird?
+
+Github's support for Org Mode is broken, so plain text it is..
 
 ----------------------------
 * LICENSE

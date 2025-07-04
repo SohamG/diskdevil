@@ -16,16 +16,11 @@ Table of Contents
 .. 3. What's all this ./configure crap?
 .. 4. Why write it in Rust?
 .. 5. How can you get the safety of rust if theres a bunch of inline asm and everything is unsafe?
+.. 6. Why is the readme looking weird?
 3. LICENSE
 
 
-[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]
-
 ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
-
-
-[https://github.com/SohamG/diskdevil/actions/workflows/tests.yml/badge.svg]
-<https://github.com/SohamG/diskdevil/actions/workflows/tests.yml>
 
 
 1 Introduction
@@ -89,6 +84,12 @@ Table of Contents
 ────────────────────────────────────────────────────────────────────────────────────────────────
 
   What's with all these questions?
+
+
+2.6 Why is the readme looking weird?
+────────────────────────────────────
+
+  Github's support for Org Mode is broken, so plain text it is..
 
   ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 
