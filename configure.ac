@@ -2,7 +2,7 @@
 
 ### Setup
 AC_PREREQ([2.72])
-m4_define([GIT_HASH], m4_esyscmd([git describe --always]))
+m4_define([GIT_HASH], m4_esyscmd([git describe --always --all]))
 AC_INIT([diskdevil], m4_defn([GIT_HASH]), [dd@sohamg.xyz])
 
 AC_CONFIG_SRCDIR([src/main.rs])

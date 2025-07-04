@@ -52,7 +52,7 @@
 
           # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
           devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; with inputs'.fenix.packages; [
+            buildInputs = with pkgs; [
               gnumake
               autoconf
               autoconf.doc
