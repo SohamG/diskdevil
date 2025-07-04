@@ -4,6 +4,10 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -31,6 +35,16 @@
           system,
           ...
         }:
+        let
+          rust-stuff = with inputs'.fenix.packages; [
+              (combine [
+                stable.rustc
+                targets.x86_64-unknown-none.stable.completeToolchain
+                stable.rust-analyzer
+              ])
+          ];
+        in
+
         {
           # Per-system attributes can be defined here. The self' and inputs'
           # module parameters provide easy access to attributes of the same
@@ -38,20 +52,22 @@
 
           # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
           devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
+            buildInputs = with pkgs; with inputs'.fenix.packages; [
               gnumake
               autoconf
+              autoconf.doc
               m4
               automake
               gcc
               gdb
-              rust-analyzer
               linuxHeaders
               act
               moreutils
             ];
+
+            # R = "${inputs'.fenix.packages.targets.x86_64-unknown-none.stable.completeToolchain}";
             shellHook = ''
-            export PATH=~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
+              #export PATH=~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
             '';
 
           };
