@@ -15,6 +15,4 @@ jobs:
 
       - name: Run make check
         run: |
-          echo "\`\`\`sh" > $GITHUB_STEP_SUMMARY
-          nix --quiet develop .# --command bash -c "autoreconf -if && ./configure -q && make -s check" 2>&1 | tee -a $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          nix --quiet develop .# --command bash -c ".github/tests.sh" 

@@ -89,6 +89,18 @@ AC_ARG_VAR([CPPFLAGS], [C Pre Processor flags])
 AC_CONFIG_COMMANDS([cpp], [$CPP $CPPFLAGS $ac_abs_srcdir/src/numbers.cpp.rs -o src/numbers.rs],
 			  [CPP="$CPP" CPPFLAGS="$CPPFLAGS"])
 
+AC_MSG_CHECKING([if running in CI])
+colour_tests="yes"
+
+AS_IF([test "x$CI" = "xtrue"],
+  [colour_tests="no"
+   AC_MSG_RESULT([yes])],
+  [colour_tests="yes"
+   AC_MSG_RESULT([no])]
+)
+
+AC_SUBST([colour_tests])
+
 AC_CONFIG_FILES([rust-project.json
 		Makefile
 		src/Makefile

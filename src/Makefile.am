@@ -23,7 +23,7 @@ testdevil_test_CFLAGS=--cfg mytest --crate-type=bin --extern std --edition 2024 
 
 
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/build-aux/tap-driver.sh
-TEST_LOG_DRIVER_FLAGS=--color-tests yes --no-merge 
+TEST_LOG_DRIVER_FLAGS=--color-tests $(colour_tests) --no-merge 
 TESTS = testdevil.test
 
 
